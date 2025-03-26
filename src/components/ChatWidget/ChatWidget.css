@@ -3,10 +3,10 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 320px;
+  width: 368px;  
   max-width: 90vw;
-  height: 450px;
-  max-height: 70vh;
+  height: 517px;  
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   background-color: white;

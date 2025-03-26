@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MessageSquare } from 'lucide-react';
 import './ChatWidget.css';
@@ -23,7 +22,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
   const [inputText, setInputText] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(true);
-  const [sessionId] = useState(() => crypto.randomUUID());
+  const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
   const [waitingForResponse, setWaitingForResponse] = useState(false);
   const { toast } = useToast();
   const botName = "Taylor";
@@ -63,6 +62,23 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
       stopRecording();
     }
     setTimeout(() => setIsMinimized(true), 300); // Wait for animation to complete
+  };
+
+  const resetChat = () => {
+    setMessages([{
+      content: "Welcome 👋! How can I help you today?",
+      isUser: false,
+      timestamp: new Date()
+    }]);
+    setSessionId(crypto.randomUUID());
+    setInputText('');
+    setWaitingForResponse(false);
+    
+    toast({
+      title: "Chat Reset",
+      description: "Started a new chat session",
+      variant: "default",
+    });
   };
 
   const sendMessage = async (content: string) => {
@@ -205,7 +221,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
 
   return (
     <div className={`chat-widget-container ${isOpen ? 'open' : 'closing'}`}>
-      <ChatHeader handleClose={handleClose} />
+      <ChatHeader handleClose={handleClose} handleReset={resetChat} />
       
       {!isMinimized && (
         <>
