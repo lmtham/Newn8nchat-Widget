@@ -15,9 +15,17 @@ interface Message {
 
 interface ChatWidgetProps {
   n8nWebhookURL: string;
+  headerTitle?: string;
+  botName?: string;
+  welcomeMessage?: string;
 }
 
-const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
+const ChatWidget: React.FC<ChatWidgetProps> = ({ 
+  n8nWebhookURL,
+  headerTitle = "Chat Widget",
+  botName = "Taylor",
+  welcomeMessage = "Welcome 👋! How can I help you today?"
+}) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -25,20 +33,19 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
   const [waitingForResponse, setWaitingForResponse] = useState(false);
   const { toast } = useToast();
-  const botName = "Taylor";
 
   // Add initial welcome message
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([
         {
-          content: "Welcome 👋! How can I help you today?",
+          content: welcomeMessage,
           isUser: false,
           timestamp: new Date()
         }
       ]);
     }
-  }, [messages]);
+  }, [messages, welcomeMessage]);
 
   const { isRecording, isTranscribing, startRecording, stopRecording } = useSpeechRecognition({
     onTranscription: (text) => {
@@ -66,7 +73,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
 
   const resetChat = () => {
     setMessages([{
-      content: "Welcome 👋! How can I help you today?",
+      content: welcomeMessage,
       isUser: false,
       timestamp: new Date()
     }]);
@@ -215,8 +222,15 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
     <>
       {isOpen && (
         <div className={`chat-widget-container ${isMinimized ? 'closing' : 'open'}`}>
-          <ChatHeader handleClose={handleClose} handleReset={resetChat} />
-          <MessageList messages={messages} botName={botName} />
+          <ChatHeader 
+            handleClose={handleClose} 
+            handleReset={resetChat}
+            title={headerTitle}
+          />
+          <MessageList 
+            messages={messages} 
+            botName={botName}
+          />
           <ChatInput
             inputText={inputText}
             setInputText={setInputText}

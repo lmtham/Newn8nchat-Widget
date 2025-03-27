@@ -1,26 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>chatty-widget-factory</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Widget Demo</title>
+  <meta name="description" content="Lovable Generated Project" />
+  <meta name="author" content="Lovable" />
 
-    <meta property="og:title" content="Lovable Generated Project" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+  <meta property="og:title" content="Lovable Generated Project" />
+  <meta property="og:description" content="Lovable Generated Project" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@lovable_dev" />
+  <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+</head>
+<body>
+  <h1>How to Embed This Widget</h1>
+  <p>To add this chat widget to your website, copy the following code snippet and paste it before the closing &lt;/body&gt; tag:</p>
+  <pre><code>
+&lt;script src="http://localhost:8081/chat-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.addEventListener('DOMContentLoaded', function() {
+    initChatWidget({
+      webhookUrl: 'YOUR_N8N_WEBHOOK_URL',
+      headerTitle: 'Chat Widget', // Optional: customize header title
+      botName: 'Taylor',         // Optional: customize bot name
+      welcomeMessage: 'Welcome 👋! How can I help you today?' // Optional: customize welcome message
+    });
+  });
+&lt;/script&gt;
+  </code></pre>
 
-  <body>
-    <div id="root"></div>
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <script src="http://localhost:8081/chat-widget.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      initChatWidget({
+        webhookUrl: 'http://localhost:5678/webhook-test/test',
+        headerTitle: 'Demo Chat',
+        botName: 'Assistant',
+        welcomeMessage: 'Hello! How may I assist you today? 🌟'
+      });
+    });
+  </script>
+  <div id="root"></div>
+  <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+  <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
 </html>
