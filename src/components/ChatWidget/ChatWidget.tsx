@@ -211,39 +211,30 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ n8nWebhookURL }) => {
     }
   };
 
-  if (!isOpen && isMinimized) {
-    return (
-      <div className="chat-widget-bubble" onClick={toggleWidget}>
-        <MessageSquare className="chat-widget-bubble-icon" />
-      </div>
-    );
-  }
-
   return (
-    <div className={`chat-widget-container ${isOpen ? 'open' : 'closing'}`}>
-      <ChatHeader handleClose={handleClose} handleReset={resetChat} />
-      
-      {!isMinimized && (
-        <>
+    <>
+      {isOpen && (
+        <div className={`chat-widget-container ${isMinimized ? 'closing' : 'open'}`}>
+          <ChatHeader handleClose={handleClose} handleReset={resetChat} />
           <MessageList messages={messages} botName={botName} />
-          
-          <ChatInput 
+          <ChatInput
             inputText={inputText}
             setInputText={setInputText}
+            sendMessage={handleSendClick}
+            handleKeyDown={handleKeyDown}
             isRecording={isRecording}
             startRecording={startRecording}
             stopRecording={stopRecording}
-            sendMessage={handleSendClick}
-            handleKeyDown={handleKeyDown}
             disabled={waitingForResponse}
           />
-          
-          <div className="chat-widget-footer">
-            Add AI chat to your site
-          </div>
-        </>
+        </div>
       )}
-    </div>
+      {!isOpen && (
+        <div className="chat-widget-bubble" onClick={toggleWidget}>
+          <MessageSquare className="chat-widget-bubble-icon" />
+        </div>
+      )}
+    </>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 
 interface UseSpeechRecognitionProps {
@@ -13,35 +12,52 @@ export function useSpeechRecognition({ onTranscription, onFinalTranscript }: Use
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSpeechTimestampRef = useRef<number>(0);
+  const IDLE_TIMEOUT = 3000; // 3 seconds idle timeout
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (silenceTimerRef.current) {
-        clearTimeout(silenceTimerRef.current);
-      }
-      if (speechRecognitionRef.current) {
-        speechRecognitionRef.current.abort();
-      }
+      cleanupRecording();
     };
   }, []);
 
-  // Reset silence timer when speech is detected
-  const resetSilenceTimer = () => {
+  const cleanupRecording = () => {
+    console.log('Cleaning up recording resources');
     if (silenceTimerRef.current) {
       clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+    if (speechRecognitionRef.current) {
+      speechRecognitionRef.current.abort();
+      speechRecognitionRef.current = null;
+    }
+  };
+
+  // Check for silence periodically
+  const startSilenceDetection = () => {
+    console.log('Starting silence detection');
+    lastSpeechTimestampRef.current = Date.now();
+    
+    if (silenceTimerRef.current) {
+      clearInterval(silenceTimerRef.current);
     }
     
-    silenceTimerRef.current = setTimeout(() => {
-      console.log("No speech detected for 2 seconds, stopping recording");
-      if (isRecording) {
+    silenceTimerRef.current = setInterval(() => {
+      const timeSinceLastSpeech = Date.now() - lastSpeechTimestampRef.current;
+      console.log(`Time since last speech: ${timeSinceLastSpeech}ms`);
+      
+      if (timeSinceLastSpeech >= IDLE_TIMEOUT && isRecording) {
+        console.log('Idle timeout reached, stopping recording');
         stopRecording();
       }
-    }, 2000); // 2 seconds of silence
+    }, 500); // Check every 500ms
   };
 
   const startRecording = async () => {
     try {
+      cleanupRecording(); // Cleanup any existing recording session
+      
       // Initialize Web Speech API
       const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
       
@@ -57,8 +73,17 @@ export function useSpeechRecognition({ onTranscription, onFinalTranscript }: Use
       let finalTranscript = '';
       let interimTranscript = '';
       
+      recognition.onstart = () => {
+        console.log('Speech recognition started');
+        setIsRecording(true);
+        setIsTranscribing(true);
+        startSilenceDetection();
+      };
+      
       recognition.onresult = (event) => {
         interimTranscript = '';
+        lastSpeechTimestampRef.current = Date.now(); // Update last speech timestamp
+        console.log('Speech detected, resetting idle timer');
         
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
@@ -72,97 +97,45 @@ export function useSpeechRecognition({ onTranscription, onFinalTranscript }: Use
         
         // Update with current transcription
         onTranscription(finalTranscript || interimTranscript);
-        
-        // Reset the silence timer since we detected speech
-        resetSilenceTimer();
       };
       
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
+        cleanupRecording();
         setIsRecording(false);
         setIsTranscribing(false);
-        if (silenceTimerRef.current) {
-          clearTimeout(silenceTimerRef.current);
-        }
       };
       
       recognition.onend = () => {
-        // Only process if we're still in recording state
-        // This prevents processing when there's a stop called programmatically
-        console.log("Speech recognition ended, recording state:", isRecording);
-        
+        console.log('Speech recognition ended');
+        cleanupRecording();
         setIsRecording(false);
         setIsTranscribing(false);
         
-        if (silenceTimerRef.current) {
-          clearTimeout(silenceTimerRef.current);
-        }
-        
-        // Only send the message if we have a transcript and we didn't manually stop
+        // Send final transcript if available
         if (finalTranscript.trim()) {
-          onFinalTranscript(finalTranscript);
+          onFinalTranscript(finalTranscript.trim());
         }
       };
       
-      // Start the silence timer
-      resetSilenceTimer();
-      
+      // Start recognition
       recognition.start();
       speechRecognitionRef.current = recognition;
-      setIsRecording(true);
-      setIsTranscribing(true);
       
     } catch (error) {
-      console.error('Error starting speech recognition:', error);
-      
-      // Fall back to audio recording if speech recognition is not available
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorderRef.current = mediaRecorder;
-        audioChunksRef.current = [];
-        
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            audioChunksRef.current.push(event.data);
-          }
-        };
-        
-        mediaRecorder.onstop = async () => {
-          // Convert audio chunks to blob and then to base64
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-          
-          // In a real app, you would send this to a speech-to-text service
-          // For demo, we'll use a placeholder message
-          const transcription = "Voice message received (speech-to-text not available in this browser)";
-          onFinalTranscript(transcription);
-          
-          // Stop all audio tracks
-          stream.getTracks().forEach(track => track.stop());
-        };
-        
-        mediaRecorder.start();
-        setIsRecording(true);
-      } catch (microError) {
-        console.error('Error accessing microphone:', microError);
-      }
+      console.error('Error starting recording:', error);
+      cleanupRecording();
+      setIsRecording(false);
+      setIsTranscribing(false);
     }
   };
 
   const stopRecording = () => {
-    console.log("Stopping recording. IsTranscribing:", isTranscribing, "IsRecording:", isRecording);
-    
-    if (silenceTimerRef.current) {
-      clearTimeout(silenceTimerRef.current);
-      silenceTimerRef.current = null;
-    }
+    console.log('Stopping recording');
+    cleanupRecording();
     
     if (speechRecognitionRef.current) {
       speechRecognitionRef.current.stop();
-      // The onend handler will take care of the rest
-    } else if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
     }
     
     setIsRecording(false);
