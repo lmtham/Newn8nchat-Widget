@@ -211,7 +211,7 @@
   max-height: 92px;
 }
 
-.chat-widget-input-textarea {
+.chat-widget-input input {
   flex: 1;
   border: none;
   outline: none;
@@ -219,31 +219,17 @@
   background-color: transparent;
   font-size: 14px;
   line-height: 1.4;
-  min-height: 32px;
-  max-height: 74px;
+  min-height: 28px;
+  max-height: 64px;
   resize: none;
   overflow-y: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  direction: rtl; /* Makes text scroll from right, showing latest content */
 }
 
-.chat-widget-input-textarea::-webkit-scrollbar {
-  width: 4px;
-}
-
-.chat-widget-input-textarea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.chat-widget-input-textarea::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-.chat-widget-input-textarea::placeholder {
-  color: #999;
+.chat-widget-input input::placeholder {
+  direction: ltr; /* Reset direction for placeholder text */
 }
 
 .chat-widget-actions {

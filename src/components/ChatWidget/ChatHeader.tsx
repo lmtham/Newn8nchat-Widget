@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, RefreshCw } from 'lucide-react';
+import { X, RefreshCw, User } from 'lucide-react';
 
 interface ChatHeaderProps {
   handleClose: () => void;
@@ -12,6 +12,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ handleClose, handleReset, title
     <div className="chat-widget-header">
       <div className="chat-widget-title">{title}</div>
       <div className="chat-widget-controls">
+        <User className="chat-widget-control-icon" />
         <RefreshCw 
           className="chat-widget-control-icon" 
           onClick={handleReset}

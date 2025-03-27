@@ -211,7 +211,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({
     sendMessage(inputText);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage(inputText);

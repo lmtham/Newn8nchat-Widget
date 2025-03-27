@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+
+import React from 'react';
 import { Send, Mic, MicOff } from 'lucide-react';
 
 interface ChatInputProps {
@@ -8,7 +9,7 @@ interface ChatInputProps {
   startRecording: () => void;
   stopRecording: () => void;
   sendMessage: () => void;
-  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   disabled?: boolean;
 }
 
@@ -22,15 +23,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
   handleKeyDown,
   disabled = false
 }) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Auto-scroll to the end of the textarea when text changes
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
-    }
-  }, [inputText]);
-
   return (
     <div className="chat-widget-input">
       <div className="chat-widget-input-container">
@@ -53,15 +45,13 @@ const ChatInput: React.FC<ChatInputProps> = ({
             <Mic size={18} />
           </button>
         )}
-        <textarea
-          ref={textareaRef}
+        <input
+          type="text"
           placeholder={disabled ? "Waiting for response..." : "Type your message..."}
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isRecording || disabled}
-          rows={1}
-          className="chat-widget-input-textarea"
         />
         <button 
           className="chat-widget-send-button"
