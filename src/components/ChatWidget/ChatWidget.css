@@ -211,7 +211,7 @@
   max-height: 80px;
 }
 
-.chat-widget-input input {
+.chat-widget-input-textarea {
   flex: 1;
   border: none;
   outline: none;
@@ -221,14 +221,29 @@
   line-height: 1.4;
   min-height: 28px;
   max-height: 64px;
+  resize: none;
   overflow-y: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
-  direction: rtl; /* Makes text scroll from right, showing latest content */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-.chat-widget-input input::placeholder {
-  direction: ltr; /* Reset direction for placeholder text */
+.chat-widget-input-textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-widget-input-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-widget-input-textarea::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.chat-widget-input-textarea::placeholder {
+  color: #999;
 }
 
 .chat-widget-actions {
